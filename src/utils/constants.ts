@@ -1,0 +1,31 @@
+export const APP_CONFIG = {
+  name: "ArogyaSetu CaseIntake",
+  title: "Structured Clinical Case-Taking & Medical Document Digitization",
+  version: "1.0.0-alpha",
+  problemStatement: "SIH26047",
+  consentVersion: "v1.0-SIH2026",
+  emergencyHelplines: {
+    nationalEmergency: "112",
+    ambulanceIndia: "108",
+    nationalHealthHelpline: "1800-180-1104",
+  },
+  supportedLanguages: [
+    { code: "en", name: "English" },
+    { code: "hi", name: "Hindi (हिंदी)" },
+    { code: "bn", name: "Bengali (বাংলা)" },
+    { code: "te", name: "Telugu (తెలుగు)" },
+    { code: "mr", name: "Marathi (मराठी)" },
+    { code: "ta", name: "Tamil (தமிழ்)" },
+  ],
+  symptomCategories: [
+    "General & Constitutional",
+    "Respiratory",
+    "Cardiovascular",
+    "Gastrointestinal",
+    "Neurological",
+    "Musculoskeletal",
+    "Dermatological",
+    "ENT & Ophthalmology",
+    "Genitourinary",
+  ],
+};
