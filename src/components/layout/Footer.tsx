@@ -1,9 +1,26 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Stethoscope, ShieldCheck, Heart, FileCode2, PhoneCall } from "lucide-react";
 import { APP_CONFIG } from "@/utils/constants";
 
-export function Footer() {
+export function Footer({ forceShow = false }: { forceShow?: boolean }) {
+  const pathname = usePathname();
+
+  // Hide global Footer on dashboard and application routes unless explicitly forced
+  if (
+    !forceShow &&
+    (pathname.startsWith("/doctor") ||
+    pathname.startsWith("/patient") ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/triage") ||
+    pathname.startsWith("/case-taking"))
+  ) {
+    return null;
+  }
+
   return (
     <footer className="border-t border-border/80 bg-card text-card-foreground">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">

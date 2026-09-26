@@ -219,7 +219,7 @@ export function Sidebar({
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden lg:block h-screen sticky top-0">{content}</div>
+      <div className="hidden lg:block h-screen fixed top-0 left-0 z-40">{content}</div>
 
       {/* Mobile Drawer */}
       {isOpenMobile && (

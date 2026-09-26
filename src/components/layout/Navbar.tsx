@@ -30,6 +30,17 @@ import { GlobalLanguageDropdown } from "@/components/i18n/GlobalLanguageDropdown
 export function Navbar() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Hide global Navbar on dashboard and application routes
+  if (
+    pathname.startsWith("/doctor") ||
+    pathname.startsWith("/patient") ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/triage") ||
+    pathname.startsWith("/case-taking")
+  ) {
+    return null;
+  }
   const { data: session, status } = useSession();
   const { t, dict } = useLanguage();
   const isAuthenticated = status === "authenticated" && !!session?.user;
