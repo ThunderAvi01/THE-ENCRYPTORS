@@ -13,7 +13,6 @@ export interface InformedConsentRecord {
   scope: {
     clinicalCaseTaking: boolean;
     aiAssistedHistoryCollection: boolean;
-    documentDigitizationOcr: boolean;
     doctorVerificationSharing: boolean;
     anonymizedResearchTelemetry: boolean;
   };

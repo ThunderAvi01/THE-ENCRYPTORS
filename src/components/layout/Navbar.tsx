@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
   Stethoscope,
@@ -18,13 +19,19 @@ import {
   LayoutDashboard,
   LogIn,
   UserPlus,
+  BookOpen,
+  Home,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { GlobalLanguageDropdown } from "@/components/i18n/GlobalLanguageDropdown";
 
 export function Navbar() {
+  const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { data: session, status } = useSession();
+  const { t, dict } = useLanguage();
   const isAuthenticated = status === "authenticated" && !!session?.user;
   const role = session?.user?.role;
 
@@ -45,8 +52,11 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-md transition-all">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Brand / Logo */}
-        <Link href="/" className="flex items-center gap-2.5 transition hover:opacity-90">
+        {/* Brand / Logo: redirects to role dashboard when logged in, or / when logged out */}
+        <Link
+          href={isAuthenticated ? getDashboardLink() : "/"}
+          className="flex items-center gap-2.5 transition hover:opacity-90"
+        >
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 text-white shadow-md shadow-teal-500/20">
             <Stethoscope className="h-5 w-5" />
           </div>
@@ -60,45 +70,96 @@ export function Navbar() {
               </Badge>
             </div>
             <span className="text-[10px] text-muted-foreground font-medium">
-              Structured Case-Taking & Digitization
+              Structured Case-Taking & Clinical Decision Support
             </span>
           </div>
         </Link>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
-          <Link
-            href="/#pipeline"
-            className="transition hover:text-foreground flex items-center gap-1.5"
-          >
-            <Sparkles className="h-4 w-4 text-teal-600 dark:text-teal-400" />
-            Clinical Pipeline
-          </Link>
-          <Link
-            href="/case-taking"
-            className="transition hover:text-foreground flex items-center gap-1.5"
-          >
-            <FileText className="h-4 w-4" />
-            Case Intake
-          </Link>
-          <Link
-            href="/#doctor-verification"
-            className="transition hover:text-foreground flex items-center gap-1.5"
-          >
-            <FileCheck2 className="h-4 w-4 text-emerald-600" />
-            Doctor Review
-          </Link>
-          <Link
-            href="/#safety"
-            className="transition hover:text-foreground flex items-center gap-1.5"
-          >
-            <ShieldCheck className="h-4 w-4 text-amber-500" />
-            Safety Guardrails
-          </Link>
+        {/* Desktop Segmented Pill Switch Navigation: Custom per role */}
+        <nav className="hidden md:flex items-center p-1 rounded-full border border-border/80 bg-muted/40 backdrop-blur-md shadow-inner">
+          {(isAuthenticated
+            ? role === "DOCTOR"
+              ? [
+                  {
+                    href: "/doctor/dashboard",
+                    label: dict.navigation.dashboard,
+                    icon: <LayoutDashboard className="h-4 w-4" />,
+                    activeColor: "text-emerald-600 dark:text-emerald-400",
+                  },
+                  {
+                    href: "/doctor/queue",
+                    label: dict.navigation.doctorReview,
+                    icon: <FileCheck2 className="h-4 w-4" />,
+                    activeColor: "text-emerald-600 dark:text-emerald-400",
+                  },
+                  {
+                    href: "/documentation",
+                    label: dict.navigation.documentation,
+                    icon: <BookOpen className="h-4 w-4" />,
+                    activeColor: "text-teal-600 dark:text-teal-400",
+                  },
+                ]
+              : [
+                  // For Patients (and other non-doctor authenticated users): No separate case taking / doctor review nav
+                  {
+                    href: getDashboardLink(),
+                    label: dict.navigation.dashboard,
+                    icon: <LayoutDashboard className="h-4 w-4" />,
+                    activeColor: "text-teal-600 dark:text-teal-400",
+                  },
+                  {
+                    href: "/documentation",
+                    label: dict.navigation.documentation,
+                    icon: <BookOpen className="h-4 w-4" />,
+                    activeColor: "text-teal-600 dark:text-teal-400",
+                  },
+                ]
+            : [
+                {
+                  href: "/",
+                  label: dict.navigation.home,
+                  icon: <Home className="h-4 w-4" />,
+                  activeColor: "text-teal-600 dark:text-teal-400",
+                },
+                {
+                  href: "/documentation",
+                  label: dict.navigation.documentation,
+                  icon: <BookOpen className="h-4 w-4" />,
+                  activeColor: "text-teal-600 dark:text-teal-400",
+                },
+              ]
+          ).map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`relative px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 flex items-center gap-1.5 select-none ${
+                  isActive
+                    ? "bg-card text-foreground shadow-sm shadow-teal-500/10 border border-border scale-[1.02]"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                }`}
+              >
+                <span
+                  className={`transition-transform duration-300 ${
+                    isActive ? `${item.activeColor} scale-110` : "opacity-70"
+                  }`}
+                >
+                  {item.icon}
+                </span>
+                <span>{item.label}</span>
+                {isActive && (
+                  <span className="h-1.5 w-1.5 rounded-full bg-teal-500 animate-pulse ml-0.5" />
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
-        {/* Auth / Profile Actions */}
+        {/* Auth / Profile & Language Actions */}
         <div className="hidden lg:flex items-center gap-3">
+          <GlobalLanguageDropdown />
+
           {isAuthenticated ? (
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-card">
@@ -117,13 +178,6 @@ export function Navbar() {
                 </div>
               </div>
 
-              <Link href={getDashboardLink()}>
-                <Button variant="clinical" size="sm" className="gap-1.5 text-xs">
-                  <LayoutDashboard className="h-3.5 w-3.5" />
-                  Dashboard
-                </Button>
-              </Link>
-
               <Button
                 variant="outline"
                 size="sm"
@@ -131,7 +185,7 @@ export function Navbar() {
                 className="gap-1 text-xs text-muted-foreground hover:text-rose-600"
               >
                 <LogOut className="h-3.5 w-3.5" />
-                Sign Out
+                {dict.navigation.logout}
               </Button>
             </div>
           ) : (
@@ -139,21 +193,22 @@ export function Navbar() {
               <Link href="/login">
                 <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
                   <LogIn className="h-3.5 w-3.5" />
-                  Sign In
+                  {dict.navigation.login}
                 </Button>
               </Link>
               <Link href="/register">
-                <Button variant="clinical" size="sm" className="gap-1.5 text-xs">
+                <Button variant="clinical" size="sm" className="gap-1.5 text-xs font-semibold">
                   <UserPlus className="h-3.5 w-3.5" />
-                  Register
+                  {dict.navigation.register}
                 </Button>
               </Link>
             </div>
           )}
         </div>
 
-        {/* Mobile Menu Button */}
-        <div className="flex md:hidden">
+        {/* Mobile Language & Menu Toggle */}
+        <div className="flex items-center gap-2 md:hidden">
+          <GlobalLanguageDropdown />
           <Button
             variant="ghost"
             size="icon"
@@ -179,34 +234,85 @@ export function Navbar() {
               </div>
             )}
 
-            <Link
-              href="/#pipeline"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-2 py-1.5 text-sm font-medium hover:text-teal-600"
-            >
-              Clinical Pipeline
-            </Link>
-            <Link
-              href="/case-taking"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-2 py-1.5 text-sm font-medium hover:text-teal-600"
-            >
-              Patient Case Intake
-            </Link>
-            <Link
-              href="/#doctor-verification"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-2 py-1.5 text-sm font-medium hover:text-teal-600"
-            >
-              Doctor Verification
-            </Link>
-            <Link
-              href="/#safety"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-2 py-1.5 text-sm font-medium hover:text-teal-600"
-            >
-              Safety Guardrails
-            </Link>
+            {/* Mobile Segmented Switch Toggle */}
+            <div className="flex flex-col p-1 rounded-2xl border border-border bg-muted/30 space-y-1">
+              {(isAuthenticated
+                ? role === "DOCTOR"
+                  ? [
+                      {
+                        href: "/doctor/dashboard",
+                        label: dict.navigation.dashboard,
+                        icon: <LayoutDashboard className="h-4 w-4" />,
+                        activeColor: "text-emerald-600 dark:text-emerald-400",
+                      },
+                      {
+                        href: "/doctor/queue",
+                        label: dict.navigation.doctorReview,
+                        icon: <FileCheck2 className="h-4 w-4" />,
+                        activeColor: "text-emerald-600 dark:text-emerald-400",
+                      },
+                      {
+                        href: "/documentation",
+                        label: dict.navigation.documentation,
+                        icon: <BookOpen className="h-4 w-4" />,
+                        activeColor: "text-teal-600 dark:text-teal-400",
+                      },
+                    ]
+                  : [
+                      // Patients (and non-doctor roles): only Dashboard and Documentation
+                      {
+                        href: getDashboardLink(),
+                        label: dict.navigation.dashboard,
+                        icon: <LayoutDashboard className="h-4 w-4" />,
+                        activeColor: "text-teal-600 dark:text-teal-400",
+                      },
+                      {
+                        href: "/documentation",
+                        label: dict.navigation.documentation,
+                        icon: <BookOpen className="h-4 w-4" />,
+                        activeColor: "text-teal-600 dark:text-teal-400",
+                      },
+                    ]
+                : [
+                    {
+                      href: "/",
+                      label: dict.navigation.home,
+                      icon: <Home className="h-4 w-4" />,
+                      activeColor: "text-teal-600 dark:text-teal-400",
+                    },
+                    {
+                      href: "/documentation",
+                      label: dict.navigation.documentation,
+                      icon: <BookOpen className="h-4 w-4" />,
+                      activeColor: "text-teal-600 dark:text-teal-400",
+                    },
+                  ]
+              ).map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                      isActive
+                        ? "bg-card text-foreground shadow-sm border border-border"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className={isActive ? item.activeColor : "opacity-70"}>
+                        {item.icon}
+                      </span>
+                      <span>{item.label}</span>
+                    </div>
+                    {isActive && (
+                      <span className="h-2 w-2 rounded-full bg-teal-500 animate-pulse" />
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
 
             <div className="pt-2 flex flex-col gap-2 border-t border-border">
               {isAuthenticated ? (
@@ -214,7 +320,7 @@ export function Navbar() {
                   <Link href={getDashboardLink()} onClick={() => setIsMobileMenuOpen(false)}>
                     <Button variant="clinical" className="w-full justify-center gap-1.5">
                       <LayoutDashboard className="h-4 w-4" />
-                      Go to Dashboard
+                      {dict.navigation.dashboard}
                     </Button>
                   </Link>
                   <Button
@@ -223,27 +329,27 @@ export function Navbar() {
                       setIsMobileMenuOpen(false);
                       signOut({ callbackUrl: "/login" });
                     }}
-                    className="w-full justify-center gap-1.5 text-rose-600 hover:text-rose-700"
+                    className="w-full justify-center gap-1.5 text-muted-foreground hover:text-rose-600"
                   >
                     <LogOut className="h-4 w-4" />
-                    Sign Out
+                    {dict.navigation.logout}
                   </Button>
                 </>
               ) : (
-                <>
+                <div className="grid grid-cols-2 gap-2">
                   <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full justify-center gap-1.5">
+                    <Button variant="outline" className="w-full justify-center gap-1">
                       <LogIn className="h-4 w-4" />
-                      Sign In
+                      {dict.navigation.login}
                     </Button>
                   </Link>
                   <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button variant="clinical" className="w-full justify-center gap-1.5">
+                    <Button variant="clinical" className="w-full justify-center gap-1">
                       <UserPlus className="h-4 w-4" />
-                      Create Account
+                      {dict.navigation.register}
                     </Button>
                   </Link>
-                </>
+                </div>
               )}
             </div>
           </div>

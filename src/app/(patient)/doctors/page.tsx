@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { DoctorChamberMap } from "@/components/maps/DoctorChamberMap";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export interface DoctorSearchResult {
   _id: string;
@@ -48,6 +49,7 @@ export interface DoctorSearchResult {
 }
 
 export default function DoctorDiscoveryPage() {
+  const { dict } = useLanguage();
   const [doctors, setDoctors] = useState<DoctorSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -155,7 +157,7 @@ export default function DoctorDiscoveryPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchDoctors()}
-                placeholder="Search doctor name or clinic..."
+                placeholder={dict.doctors.searchPlaceholder}
                 className="w-full rounded-xl border border-input bg-background pl-9 pr-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500/50"
               />
             </div>
@@ -166,7 +168,7 @@ export default function DoctorDiscoveryPage() {
               <input
                 value={selectedLocation}
                 onChange={(e) => setSelectedLocation(e.target.value)}
-                placeholder="City or Location..."
+                placeholder={dict.doctors.locationPlaceholder}
                 className="w-full rounded-xl border border-input bg-background pl-9 pr-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500/50"
               />
             </div>
@@ -179,24 +181,24 @@ export default function DoctorDiscoveryPage() {
               className="gap-1.5 font-bold text-xs h-9"
             >
               <Search className="h-4 w-4" />
-              <span>Search Doctors</span>
+              <span>{dict.common.search}</span>
             </Button>
           </div>
 
           {/* AYUSH System Filter Buttons */}
           <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/50">
             <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mr-1">
-              AYUSH Systems:
+              {dict.doctors.filterAyush}:
             </span>
 
             {[
-              { label: "All Systems", value: "ALL" },
-              { label: "Ayurveda", value: "AYURVEDA" },
-              { label: "Yoga & Naturopathy", value: "YOGA_NATUROPATHY" },
-              { label: "Unani", value: "UNANI" },
-              { label: "Siddha", value: "SIDDHA" },
-              { label: "Homoeopathy", value: "HOMEOPATHY" },
-              { label: "Allopathy", value: "ALLOPATHY" },
+              { label: dict.doctors.allSystems, value: "ALL" },
+              { label: dict.doctors.ayurveda, value: "AYURVEDA" },
+              { label: dict.doctors.yogaNaturopathy, value: "YOGA_NATUROPATHY" },
+              { label: dict.doctors.unani, value: "UNANI" },
+              { label: dict.doctors.siddha, value: "SIDDHA" },
+              { label: dict.doctors.homeopathy, value: "HOMEOPATHY" },
+              { label: dict.doctors.allopathy, value: "ALLOPATHY" },
             ].map((sys) => (
               <button
                 key={sys.value}
@@ -256,7 +258,7 @@ export default function DoctorDiscoveryPage() {
                           ₹{doc.consultationFee}
                         </span>
                         <span className="block text-[10px] text-muted-foreground font-medium">
-                          Consultation Fee
+                          {dict.doctors.consultationFee}
                         </span>
                       </div>
                     </div>
@@ -267,7 +269,7 @@ export default function DoctorDiscoveryPage() {
                     <div className="p-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 flex items-center justify-between text-xs font-bold text-emerald-700 dark:text-emerald-300">
                       <div className="flex items-center gap-1.5">
                         <Clock className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                        <span>Available Today: 10:00 AM – 01:00 PM</span>
+                        <span>{dict.doctors.availableBadge}: 10:00 AM – 01:00 PM</span>
                       </div>
                       <Badge variant="verified" className="text-[9px]">ACTIVE</Badge>
                     </div>
@@ -287,7 +289,7 @@ export default function DoctorDiscoveryPage() {
                       className="text-xs font-bold gap-1 shadow-sm"
                     >
                       <Calendar className="h-3.5 w-3.5" />
-                      <span>Book Appointment</span>
+                      <span>{dict.doctors.bookAppointmentBtn}</span>
                     </Button>
                   </CardFooter>
                 </Card>

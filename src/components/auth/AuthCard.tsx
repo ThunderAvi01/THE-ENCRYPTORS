@@ -3,15 +3,17 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { Lock, Mail, ArrowRight, AlertCircle, Loader2, CheckCircle, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { loginSchema } from "@/lib/validations/auth";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export function AuthCard() {
   const router = useRouter();
+  const { dict } = useLanguage();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "";
   const errorParam = searchParams.get("error");
@@ -60,13 +62,22 @@ export function AuthCard() {
         return;
       }
 
-      // Successful login -> Redirect
-      if (callbackUrl && callbackUrl.startsWith("/")) {
+      // Successful login -> Redirect to role-specific dashboard
+      if (callbackUrl && callbackUrl.startsWith("/") && callbackUrl !== "/" && callbackUrl !== "/login") {
         router.push(callbackUrl);
       } else {
-        // Fetch session to determine role dashboard
+        const session = await getSession();
+        const role = session?.user?.role;
         router.refresh();
-        router.push("/");
+        if (role === "DOCTOR") {
+          router.push("/doctor/dashboard");
+        } else if (role === "ADMIN") {
+          router.push("/admin/dashboard");
+        } else if (role === "TRIAGE_STAFF") {
+          router.push("/triage/dashboard");
+        } else {
+          router.push("/patient/dashboard");
+        }
       }
     } catch (err) {
       console.error("Login exception:", err);
@@ -81,9 +92,9 @@ export function AuthCard() {
         <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-teal-600/10 text-teal-600 mb-1">
           <Lock className="h-6 w-6" />
         </div>
-        <CardTitle className="text-xl font-bold tracking-tight">Sign In to ArogyaIntake</CardTitle>
+        <CardTitle className="text-xl font-bold tracking-tight">{dict.auth.signInTitle}</CardTitle>
         <CardDescription className="text-xs">
-          Access your clinical case intakes, patient records, or doctor verification portal
+          {dict.auth.signInSubtitle}
         </CardDescription>
       </CardHeader>
 
@@ -98,7 +109,7 @@ export function AuthCard() {
 
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-foreground flex justify-between">
-              <span>Email Address</span>
+              <span>{dict.auth.emailLabel}</span>
               {validationErrors.email && (
                 <span className="text-[11px] text-rose-500 font-normal">{validationErrors.email}</span>
               )}
@@ -120,7 +131,7 @@ export function AuthCard() {
 
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-foreground flex justify-between">
-              <span>Password</span>
+              <span>{dict.auth.passwordLabel}</span>
               {validationErrors.password && (
                 <span className="text-[11px] text-rose-500 font-normal">{validationErrors.password}</span>
               )}
@@ -159,21 +170,77 @@ export function AuthCard() {
             {isLoading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Authenticating...</span>
+                <span>{dict.common.loading}</span>
               </>
             ) : (
               <>
-                <span>Sign In to Portal</span>
+                <span>{dict.auth.signInBtn}</span>
                 <ArrowRight className="h-4 w-4" />
               </>
             )}
           </Button>
 
           <div className="text-center text-xs text-muted-foreground">
-            Don&apos;t have an account?{" "}
-            <Link href="/register" className="font-semibold text-teal-600 hover:underline">
-              Create an account
-            </Link>
+            {dict.auth.dontHaveAccount}
+          </div>
+
+          {/* Quick Demo Credentials Switcher */}
+          <div className="mt-2 pt-3 border-t border-border/70 space-y-2 w-full">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block text-center">
+              Quick Demo Login Credentials
+            </span>
+            <div className="grid grid-cols-2 gap-1.5 text-[11px]">
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail("patient@example.com");
+                  setPassword("Password123");
+                }}
+                className="p-1.5 rounded-lg border border-border bg-muted/40 hover:bg-teal-500/10 hover:border-teal-500/40 text-left transition"
+              >
+                <span className="font-bold text-teal-600 block">👤 Patient</span>
+                <span className="text-[10px] text-muted-foreground">patient@example.com</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail("doctor@example.com");
+                  setPassword("Password123");
+                }}
+                className="p-1.5 rounded-lg border border-border bg-muted/40 hover:bg-emerald-500/10 hover:border-emerald-500/40 text-left transition"
+              >
+                <span className="font-bold text-emerald-600 block">🩺 Doctor</span>
+                <span className="text-[10px] text-muted-foreground">doctor@example.com</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail("admin@example.com");
+                  setPassword("Password123");
+                }}
+                className="p-1.5 rounded-lg border border-border bg-muted/40 hover:bg-purple-500/10 hover:border-purple-500/40 text-left transition"
+              >
+                <span className="font-bold text-purple-600 block">🛡️ Admin</span>
+                <span className="text-[10px] text-muted-foreground">admin@example.com</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail("triage@example.com");
+                  setPassword("Password123");
+                }}
+                className="p-1.5 rounded-lg border border-border bg-muted/40 hover:bg-amber-500/10 hover:border-amber-500/40 text-left transition"
+              >
+                <span className="font-bold text-amber-600 block">⚡ Triage Staff</span>
+                <span className="text-[10px] text-muted-foreground">triage@example.com</span>
+              </button>
+            </div>
+            <p className="text-[10px] text-center text-muted-foreground/80">
+              Demo Password for all roles: <code className="font-mono font-bold text-foreground">Password123</code>
+            </p>
           </div>
         </CardFooter>
       </form>

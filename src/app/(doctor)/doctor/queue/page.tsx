@@ -30,7 +30,7 @@ export default function DoctorQueuePage() {
           Clinical Verification Queue
         </h1>
         <p className="text-xs sm:text-sm text-muted-foreground">
-          Review structured history drafts, inspect digitized prescription OCR, and sign clinical approvals.
+          Review structured history drafts, inspect clinical case intakes, and sign clinical approvals.
         </p>
       </div>
 

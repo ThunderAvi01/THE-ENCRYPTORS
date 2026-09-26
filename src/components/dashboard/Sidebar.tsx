@@ -32,6 +32,7 @@ import {
 import { UserRole } from "@/types/user";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface SidebarProps {
   role: UserRole;
@@ -61,23 +62,17 @@ export function Sidebar({
   onCloseMobile,
 }: SidebarProps) {
   const pathname = usePathname();
+  const { dict } = useLanguage();
 
   // Navigation Items per Role
   const getNavItems = (): NavGroupItem[] => {
     switch (role) {
       case "PATIENT":
         return [
-          { id: "overview", label: "Dashboard Overview", icon: <LayoutDashboard className="h-4 w-4" /> },
-          { id: "start-case", label: "Start New Case Intake", icon: <HeartPulse className="h-4 w-4 text-teal-600" />, badge: "AI Intake" },
-          { id: "continue-case", label: "Continue Case Draft", icon: <Clock className="h-4 w-4" /> },
-          { id: "previous-cases", label: "Previous Cases History", icon: <FileText className="h-4 w-4" /> },
-          { id: "documents", label: "Medical Documents & OCR", icon: <FileScan className="h-4 w-4" />, badge: "Digitized" },
-          { id: "timeline", label: "Medical Timeline", icon: <Layers className="h-4 w-4" /> },
-          { id: "appointments", label: "Upcoming Appointments", icon: <Calendar className="h-4 w-4" /> },
-          { id: "find-doctors", label: "Find Doctors & Clinics", icon: <Search className="h-4 w-4" /> },
-          { id: "doctor-chat", label: "Doctor Consult Chat", icon: <MessageSquare className="h-4 w-4" />, badge: "Encrypted" },
-          { id: "consent", label: "Digital Consent & DPDP", icon: <ShieldCheck className="h-4 w-4 text-emerald-600" /> },
-          { id: "profile", label: "Patient Profile & ABHA", icon: <User className="h-4 w-4" /> },
+          { id: "overview", label: dict.navigation.dashboard, icon: <LayoutDashboard className="h-4 w-4" /> },
+          { id: "start-case", label: dict.patientDashboard.startIntakeBtn, icon: <HeartPulse className="h-4 w-4 text-teal-600" />, badge: "AI Intake" },
+          { id: "continue-case", label: dict.patientDashboard.continueIntake, icon: <Clock className="h-4 w-4" /> },
+          { id: "previous-cases", label: dict.patientDashboard.verifiedHistoryTitle, icon: <FileText className="h-4 w-4" /> },
         ];
 
       case "DOCTOR":

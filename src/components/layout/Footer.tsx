@@ -17,7 +17,7 @@ export function Footer() {
               <span className="font-bold text-foreground">ArogyaIntake</span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              SIH 2026 Problem Statement SIH26047. Structured Clinical Case-Taking & Medical Document Digitization.
+              SIH 2026 Problem Statement SIH26047. Structured Multilingual Clinical Case-Taking & Verified Healthcare Interoperability.
             </p>
             <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
               <ShieldCheck className="h-4 w-4" />
@@ -32,11 +32,16 @@ export function Footer() {
             </h4>
             <ul className="space-y-1.5 text-xs text-muted-foreground">
               <li>1. Digital Informed Consent</li>
-              <li>2. Structured Symptom Intake</li>
-              <li>3. AI-Assisted History Collection</li>
-              <li>4. Prescription & OCR Digitization</li>
-              <li>5. Clinical Summary Generation</li>
-              <li>6. Physician Sign-off & Verification</li>
+              <li>2. Multilingual & Multimodal Intake</li>
+              <li>3. Deterministic Safety Triage</li>
+              <li>4. AI Clinical History Synthesis</li>
+              <li>5. Doctor Verification & Sign-off</li>
+              <li>6. Appointments & FHIR R4 Interoperability</li>
+              <li className="pt-1.5 border-t border-border/50">
+                <Link href="/documentation" className="text-teal-600 hover:text-teal-500 font-semibold flex items-center gap-1">
+                  View Full Documentation &rarr;
+                </Link>
+              </li>
             </ul>
           </div>
 

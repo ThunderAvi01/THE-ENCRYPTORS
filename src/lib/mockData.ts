@@ -12,27 +12,16 @@ export interface DemoPatientCase {
   severity: "MILD" | "MODERATE" | "SEVERE" | "CRITICAL_EMERGENCY";
   status: "DRAFT" | "AI_INTAKE_COMPLETED" | "PENDING_DOCTOR_REVIEW" | "VERIFIED_BY_DOCTOR";
   doctorName?: string;
-  documentsCount: number;
   lastUpdated: string;
   stepCompleted?: string;
   lastSaved?: string;
   progressPercent?: number;
 }
 
-export interface DemoMedicalDocument {
-  id: string;
-  fileName: string;
-  documentType: "PRESCRIPTION" | "LAB_REPORT" | "DISCHARGE_SUMMARY" | "IMAGING";
-  uploadedDate: string;
-  fileSize: string;
-  status: "DIGITIZED" | "PROCESSING" | "PENDING";
-  extractedCount?: number;
-}
-
 export interface DemoTimelineEvent {
   id: string;
   date: string;
-  type: "CONSULTATION" | "VITAL_CHECK" | "DOCUMENT_UPLOAD" | "CASE_INTAKE";
+  type: "CONSULTATION" | "VITAL_CHECK" | "CASE_INTAKE";
   title: string;
   description: string;
   doctorOrFacility?: string;
@@ -100,7 +89,6 @@ export const MOCK_PATIENT_DATA = {
       severity: "MODERATE",
       status: "VERIFIED_BY_DOCTOR",
       doctorName: "Dr. Priya Sharma, MD",
-      documentsCount: 2,
       lastUpdated: "27 Aug 2026",
     },
     {
@@ -111,39 +99,9 @@ export const MOCK_PATIENT_DATA = {
       severity: "MILD",
       status: "VERIFIED_BY_DOCTOR",
       doctorName: "Dr. Rajesh V. (BAMS)",
-      documentsCount: 1,
       lastUpdated: "14 May 2026",
     },
   ] as DemoPatientCase[],
-  medicalDocuments: [
-    {
-      id: "doc-101",
-      fileName: "Past_Prescription_DrSharma.jpg",
-      documentType: "PRESCRIPTION",
-      uploadedDate: "27 Aug 2026",
-      fileSize: "1.8 MB",
-      status: "DIGITIZED",
-      extractedCount: 3,
-    },
-    {
-      id: "doc-102",
-      fileName: "CBC_Lipid_Profile_Report.pdf",
-      documentType: "LAB_REPORT",
-      uploadedDate: "20 Aug 2026",
-      fileSize: "3.2 MB",
-      status: "DIGITIZED",
-      extractedCount: 14,
-    },
-    {
-      id: "doc-103",
-      fileName: "Abdominal_Ultrasound_Summary.pdf",
-      documentType: "IMAGING",
-      uploadedDate: "10 Jan 2026",
-      fileSize: "4.1 MB",
-      status: "DIGITIZED",
-      extractedCount: 5,
-    },
-  ] as DemoMedicalDocument[],
   timelineEvents: [
     {
       id: "tl-1",
@@ -159,13 +117,6 @@ export const MOCK_PATIENT_DATA = {
       type: "CASE_INTAKE",
       title: "Structured Clinical Intake Completed",
       description: "Recorded vitals (BP: 120/80, HR: 74 bpm) and completed AI history intake.",
-    },
-    {
-      id: "tl-3",
-      date: "20 Aug 2026",
-      type: "DOCUMENT_UPLOAD",
-      title: "Lab Report Digitized",
-      description: "Uploaded CBC & Lipid profile report. OCR parsed 14 blood parameters.",
     },
   ] as DemoTimelineEvent[],
   upcomingAppointments: [

@@ -43,10 +43,10 @@ const MOCK_TIMELINE_DATA: TimelineYearGroup[] = [
       {
         id: "evt-2026-2",
         date: "20 Aug 2026",
-        title: "Comprehensive Metabolic & Lipid Panel (OCR Digitized)",
+        title: "Comprehensive Metabolic & Lipid Panel",
         type: "LAB_TEST",
         facilityOrDoctor: "Apollo Clinical Labs, New Delhi",
-        details: "5 lab parameters parsed via OCR.",
+        details: "5 lab parameters recorded.",
         labParameters: [
           { name: "HbA1c Glycated Hemoglobin", value: "8.2 %", refRange: "< 5.7 %", isAbnormal: true },
           { name: "Fasting Blood Sugar", value: "142 mg/dL", refRange: "70 - 99 mg/dL", isAbnormal: true },
@@ -125,7 +125,7 @@ export function MedicalTimelineView() {
                   {ev.labParameters && ev.labParameters.length > 0 && (
                     <div className="pt-2 space-y-1.5 border-t border-border/50">
                       <span className="font-bold text-foreground text-[11px] block">
-                        Lab Parameters (OCR Extracted):
+                        Lab Parameters (Verified):
                       </span>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {ev.labParameters.map((param, idx) => (

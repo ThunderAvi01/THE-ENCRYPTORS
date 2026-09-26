@@ -48,7 +48,6 @@ export interface MedicalDocumentReference {
   fileUrl: string;
   documentType: "PRESCRIPTION" | "LAB_REPORT" | "DISCHARGE_SUMMARY" | "IMAGING" | "OTHER";
   uploadedAt: Date;
-  ocrExtractedText?: string;
   isProcessed: boolean;
 }
 

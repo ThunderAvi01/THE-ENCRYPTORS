@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { GlobalLanguageDropdown } from "@/components/i18n/GlobalLanguageDropdown";
 
 interface TopNavProps {
   title: string;
@@ -59,6 +60,7 @@ export function TopNav({
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2.5">
+        <GlobalLanguageDropdown />
         {/* DEMO DATA indicator */}
         <Badge variant="outline" className="hidden md:flex items-center gap-1 text-[10px] text-teal-600 border-teal-500/30">
           <Sparkles className="h-3 w-3" />

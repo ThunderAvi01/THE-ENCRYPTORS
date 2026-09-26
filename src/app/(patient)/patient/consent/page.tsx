@@ -8,15 +8,16 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { AudioPlayerWidget } from "@/components/clinical/AudioPlayerWidget";
 import { ClinicalSafetyBanner } from "@/components/safety/ClinicalSafetyBanner";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function PatientConsentPage() {
+  const { dict, language } = useLanguage();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const [scope, setScope] = useState({
     clinicalCaseTaking: true,
-    documentDigitizationOcr: true,
     doctorVerificationSharing: true,
     abdmInteroperabilitySharing: true,
     anonymizedResearchTelemetry: false,
@@ -154,33 +155,27 @@ export default function PatientConsentPage() {
             {[
               {
                 key: "clinicalCaseTaking",
-                title: "1. Clinical History Intake & AI Dialogue",
-                description: "Authorize structured intake collection, symptom recording, and AI dialogue processing.",
-                audioText: "This allows the software to ask history questions and organize your medical symptoms for doctor review.",
-              },
-              {
-                key: "documentDigitizationOcr",
-                title: "2. Medical Document Digitization & OCR",
-                description: "Authorize processing and text extraction of uploaded lab reports and prescriptions.",
-                audioText: "This allows extracting text from your uploaded medical documents to build a timeline.",
+                title: dict.consent.clinicalIntakeScope,
+                description: dict.consent.clinicalIntakeDesc,
+                audioText: dict.consent.clinicalIntakeDesc,
               },
               {
                 key: "doctorVerificationSharing",
-                title: "3. Physician Sharing & Doctor Review",
-                description: "Authorize consulting doctors to access your clinical summary for verification.",
-                audioText: "This permits your consulting doctor to review your medical history summary during consultation.",
+                title: dict.consent.doctorSharingScope,
+                description: dict.consent.doctorSharingDesc,
+                audioText: dict.consent.doctorSharingDesc,
               },
               {
                 key: "abdmInteroperabilitySharing",
-                title: "4. ABDM / ABHA Interoperability Sharing",
-                description: "Authorize FHIR R4 standard data format export for Ayushman Bharat Digital Mission (ABDM).",
-                audioText: "This enables converting your medical history to standard FHIR format for seamless ABDM interoperability.",
+                title: dict.consent.abdmSharingScope,
+                description: dict.consent.abdmSharingDesc,
+                audioText: dict.consent.abdmSharingDesc,
               },
               {
                 key: "anonymizedResearchTelemetry",
-                title: "5. Anonymized Quality Research (Optional)",
-                description: "Allow de-identified aggregate telemetry to improve AYUSH clinical algorithms.",
-                audioText: "This uses completely anonymized data to improve healthcare AI models.",
+                title: dict.consent.researchTelemetryScope,
+                description: dict.consent.researchTelemetryDesc,
+                audioText: dict.consent.researchTelemetryDesc,
               },
             ].map((item) => {
               const scopeKey = item.key as keyof typeof scope;
@@ -217,7 +212,7 @@ export default function PatientConsentPage() {
 
                   {/* Audio Guidance button for low literacy users */}
                   <div className="pt-1">
-                    <AudioPlayerWidget textToSpeak={item.audioText} language="en" size="sm" />
+                    <AudioPlayerWidget textToSpeak={item.audioText} language={language} size="sm" />
                   </div>
                 </div>
               );
@@ -232,7 +227,7 @@ export default function PatientConsentPage() {
               disabled={isSaving || consentStatus === "REVOKED"}
               className="text-xs font-bold border-rose-500/30 text-rose-600 hover:bg-rose-500/10"
             >
-              <span>Revoke All Consent</span>
+              <span>{dict.consent.revokeConsent}</span>
             </Button>
 
             <Button
@@ -243,7 +238,7 @@ export default function PatientConsentPage() {
               className="text-xs font-bold gap-1.5 shadow-md"
             >
               <Save className="h-4 w-4" />
-              <span>{isSaving ? "Saving..." : "Save Preferences"}</span>
+              <span>{isSaving ? dict.common.saving : dict.consent.savePreferences}</span>
             </Button>
           </CardFooter>
         </Card>

@@ -5,6 +5,7 @@ import { Send, Paperclip, CheckCheck, User, Stethoscope, FileText, Image as Imag
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export interface ChatMessageItem {
   _id: string;
@@ -33,6 +34,7 @@ export function DoctorPatientChatWidget({
   targetRole,
   currentUserId,
 }: DoctorPatientChatWidgetProps) {
+  const { dict } = useLanguage();
   const [messages, setMessages] = useState<ChatMessageItem[]>([]);
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -133,7 +135,7 @@ export function DoctorPatientChatWidget({
       <CardContent className="flex-1 overflow-y-auto p-4 space-y-3 bg-card">
         {messages.length === 0 ? (
           <div className="h-full flex items-center justify-center text-xs text-muted-foreground italic">
-            No messages yet. Send a message to start conversation.
+            {dict.chat.noMessagesDesc}
           </div>
         ) : (
           messages.map((m) => {
@@ -141,16 +143,16 @@ export function DoctorPatientChatWidget({
             return (
               <div
                 key={m._id}
-                className={`flex gap-2.5 max-w-[85%] ${isMe ? "ml-auto flex-row-reverse" : ""}`}
+                className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}
               >
                 <div
-                  className={`p-3 rounded-2xl text-xs space-y-1.5 shadow-sm ${
+                  className={`max-w-[75%] p-3 rounded-2xl text-xs space-y-1 ${
                     isMe
-                      ? "bg-teal-600 text-white rounded-tr-none"
-                      : "bg-muted/40 border border-border text-foreground rounded-tl-none"
+                      ? "bg-teal-600 text-white rounded-br-xs shadow-sm"
+                      : "bg-muted/60 text-foreground rounded-bl-xs border border-border/60"
                   }`}
                 >
-                  <p className="leading-relaxed font-medium">{m.text}</p>
+                  <p className="leading-relaxed whitespace-pre-wrap">{m.text}</p>
 
                   {m.attachments && m.attachments.length > 0 && (
                     <div className="space-y-1 pt-1">
@@ -169,11 +171,15 @@ export function DoctorPatientChatWidget({
                     </div>
                   )}
 
-                  <div className="flex items-center justify-end gap-1 text-[9px] opacity-75">
-                    <span>
-                      {new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                    </span>
-                    {isMe && <CheckCheck className={`h-3 w-3 ${m.read ? "text-cyan-200" : ""}`} />}
+                  <div
+                    className={`flex items-center justify-end gap-1 text-[10px] ${
+                      isMe ? "text-teal-100" : "text-muted-foreground"
+                    }`}
+                  >
+                    <span>{new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                    {isMe && (
+                      <CheckCheck className={`h-3 w-3 ${m.read ? "text-cyan-200" : "opacity-60"}`} />
+                    )}
                   </div>
                 </div>
               </div>
@@ -183,17 +189,17 @@ export function DoctorPatientChatWidget({
         <div ref={chatEndRef} />
       </CardContent>
 
-      {/* Input Area */}
-      <div className="p-3 border-t border-border bg-card space-y-2">
+      {/* Input Tray */}
+      <div className="p-3 border-t border-border/60 bg-muted/20 space-y-2">
         {attachmentUrl && (
-          <div className="flex items-center justify-between p-2 rounded-lg bg-muted/40 text-xs border border-border">
+          <div className="flex items-center justify-between p-2 rounded-lg bg-teal-500/10 border border-teal-500/20 text-xs">
             <span className="font-semibold text-teal-600 truncate">Attachment added</span>
             <button
               type="button"
               onClick={() => setAttachmentUrl("")}
               className="text-rose-500 font-bold hover:underline"
             >
-              Remove
+              {dict.common.delete}
             </button>
           </div>
         )}
@@ -203,7 +209,7 @@ export function DoctorPatientChatWidget({
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-            placeholder="Type your message..."
+            placeholder={dict.chat.typePlaceholder}
             className="flex-1 rounded-xl border border-input bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500/50"
           />
 
@@ -216,7 +222,7 @@ export function DoctorPatientChatWidget({
               if (url) setAttachmentUrl(url);
             }}
             className="h-9 w-9 p-0 border-border"
-            title="Attach Document"
+            title={dict.chat.attachmentBtn}
           >
             <Paperclip className="h-4 w-4 text-muted-foreground" />
           </Button>
@@ -229,7 +235,7 @@ export function DoctorPatientChatWidget({
             className="gap-1 text-xs font-bold h-9"
           >
             <Send className="h-3.5 w-3.5" />
-            <span>Send</span>
+            <span>{dict.chat.sendBtn}</span>
           </Button>
         </div>
       </div>

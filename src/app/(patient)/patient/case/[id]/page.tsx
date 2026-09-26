@@ -23,6 +23,9 @@ import {
   HeartPulse,
 } from "lucide-react";
 
+import mongoose from "mongoose";
+import { MOCK_PATIENT_DATA } from "@/lib/mockData";
+
 interface PatientCaseViewPageProps {
   params: Promise<{ id: string }>;
 }
@@ -36,16 +39,44 @@ export default async function PatientCaseViewPage({ params }: PatientCaseViewPag
   const { id } = await params;
   await connectToDatabase();
 
-  const caseRecord = await CaseRecord.findOne({ _id: id, patientId: user.id });
-  if (!caseRecord) {
-    notFound();
+  const isValidObjectId = mongoose.Types.ObjectId.isValid(id);
+
+  let rawCase = isValidObjectId
+    ? await CaseRecord.findOne({ _id: id, patientId: user.id })
+    : null;
+
+  // Graceful fallback for mock/demo cases (e.g., "case-881")
+  if (!rawCase) {
+    const demoCase = MOCK_PATIENT_DATA.previousCases.find((c) => c.id === id);
+    if (demoCase || id.startsWith("case-")) {
+      rawCase = {
+        _id: id,
+        caseNumber: demoCase?.caseNumber || "CASE-2026-081",
+        chiefComplaint: demoCase?.chiefComplaint || "Upper abdominal burning discomfort & postprandial acidity",
+        ayushSystem: "ALLOPATHY / AYURVEDA",
+        severity: demoCase?.severity || "MODERATE",
+        status: (demoCase?.status === "VERIFIED_BY_DOCTOR" ? "VERIFIED" : demoCase?.status) || "VERIFIED",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        intakeSummary: { duration: "3 Days", onset: "Gradual" },
+      } as any;
+    } else {
+      notFound();
+    }
   }
 
+  if (!rawCase) {
+    notFound();
+  }
+  const caseRecord = rawCase;
+
   // Find linked clinical session
-  const session = await ClinicalSession.findOne({
-    patientId: user.id,
-    status: "COMPLETED",
-  }).sort({ completedAt: -1 });
+  const session = isValidObjectId
+    ? await ClinicalSession.findOne({
+        patientId: user.id,
+        status: "COMPLETED",
+      }).sort({ completedAt: -1 })
+    : null;
 
   const history = session?.clinicalHistory;
 
@@ -79,7 +110,7 @@ export default async function PatientCaseViewPage({ params }: PatientCaseViewPag
             <div className="flex items-center gap-2">
               <StatusBadge status={caseRecord.status} />
               <span className="text-xs font-semibold text-muted-foreground">
-                Submitted on {new Date(caseRecord.createdAt).toLocaleDateString()}
+                Submitted on {new Date(caseRecord.createdAt).toISOString().split("T")[0]}
               </span>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-foreground">

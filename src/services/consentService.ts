@@ -15,7 +15,6 @@ export class ConsentService {
 
     const scope: IConsentScope = {
       clinicalCaseTaking: customScope?.clinicalCaseTaking ?? true,
-      documentDigitizationOcr: customScope?.documentDigitizationOcr ?? true,
       doctorVerificationSharing: customScope?.doctorVerificationSharing ?? true,
       abdmInteroperabilitySharing: customScope?.abdmInteroperabilitySharing ?? true,
       anonymizedResearchTelemetry: customScope?.anonymizedResearchTelemetry ?? false,

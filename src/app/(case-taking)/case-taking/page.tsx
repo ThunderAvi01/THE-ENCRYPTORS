@@ -30,16 +30,19 @@ import { AudioPlayerWidget } from "@/components/clinical/AudioPlayerWidget";
 import { EmergencyRedFlagModal } from "@/components/safety/EmergencyRedFlagModal";
 import { evaluateSafetyStatus } from "@/services/safety/safetyEngine";
 import { getTranslations } from "@/lib/i18n/translations";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { getLocalizedQuestion } from "@/lib/questionnaires/questionTranslations";
 import { AyushSystem } from "@/types/user";
 
 export default function ClinicalCaseTakingPage() {
   const router = useRouter();
+  const { language: globalLang, setLanguage: setGlobalLang } = useLanguage();
 
   const [intakeMode, setIntakeMode] = useState<"WIZARD" | "AI_DIALOGUE">("WIZARD");
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
-  const [selectedLanguage, setSelectedLanguage] = useState("en");
+  const [selectedLanguage, setSelectedLanguage] = useState(globalLang || "en");
   const [selectedAyushSystem, setSelectedAyushSystem] = useState<AyushSystem>("ALLOPATHY");
 
   const [isLoading, setIsLoading] = useState(true);
@@ -75,6 +78,14 @@ export default function ClinicalCaseTakingPage() {
     loadActiveSession();
   }, []);
 
+  // Keep local selectedLanguage synced with global language
+  useEffect(() => {
+    if (globalLang && globalLang !== selectedLanguage) {
+      setSelectedLanguage(globalLang);
+      setAnswers((prev) => ({ ...prev, selected_language: globalLang }));
+    }
+  }, [globalLang]);
+
   // Filter questions based on current selected AYUSH system
   const activeQuestions = CLINICAL_QUESTION_REGISTRY.filter((q) => {
     if (q.ayushSystemFilter) {
@@ -88,7 +99,8 @@ export default function ClinicalCaseTakingPage() {
 
   const totalSteps = activeQuestions.length;
   const isReviewStep = currentStepIndex >= totalSteps;
-  const currentQuestion = activeQuestions[currentStepIndex];
+  const rawQuestion = activeQuestions[currentStepIndex];
+  const currentQuestion = rawQuestion ? getLocalizedQuestion(rawQuestion, selectedLanguage) : undefined;
 
   const handleAnswerChange = (newValue: unknown) => {
     if (!currentQuestion) return;
@@ -107,7 +119,9 @@ export default function ClinicalCaseTakingPage() {
     }
 
     if (currentQuestion.id === "selected_language") {
-      setSelectedLanguage(String(newValue));
+      const langCode = String(newValue);
+      setSelectedLanguage(langCode);
+      setGlobalLang(langCode);
     }
     if (currentQuestion.id === "ayush_system_selection") {
       setSelectedAyushSystem(newValue as AyushSystem);
@@ -344,7 +358,7 @@ export default function ClinicalCaseTakingPage() {
             </div>
 
             {/* REVIEW STEP VIEW */}
-            {isReviewStep ? (
+            {isReviewStep || !currentQuestion ? (
               <CaseReviewSummary
                 answers={answers}
                 ayushSystem={(answers["ayush_system_selection"] as AyushSystem) || selectedAyushSystem}

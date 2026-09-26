@@ -49,9 +49,8 @@ export default function FHIRJudgeDemoPage() {
     allergies: ["Penicillin allergy"],
     documents: [
       {
-        id: "doc-ocr-101",
+        id: "doc-ref-101",
         fileName: "Blood_Report_Aug2026.pdf",
-        ocrExtractedText: "Blood Glucose Fasting: 110 mg/dL. HbA1c: 6.4%. Normal renal function.",
       },
     ],
     createdAt: "2026-08-28T10:30:00.000Z",
@@ -167,7 +166,7 @@ export default function FHIRJudgeDemoPage() {
                   <span className="text-emerald-700 dark:text-emerald-300 font-bold">Consent Status:</span>
                   <p className="text-sm font-black text-emerald-800 dark:text-emerald-200">GRANTED (Active)</p>
                   <p className="text-[11px] text-muted-foreground">
-                    Scope: Clinical Intake, OCR Processing, Doctor Sharing, ABDM FHIR Sharing
+                    Scope: Clinical Intake, Doctor Sharing, ABDM FHIR Sharing
                   </p>
                 </div>
               </div>

@@ -21,10 +21,29 @@ import {
   Droplet,
   MapPin,
   Calendar,
-  FileScan,
+  FileCheck2,
   Layers,
   CheckCircle2,
 } from "lucide-react";
+
+import mongoose from "mongoose";
+import { MOCK_PATIENT_DATA } from "@/lib/mockData";
+import { SummaryContent } from "@/types/summary";
+
+const MOCK_DEFAULT_SUMMARY: SummaryContent = {
+  chiefComplaint: "Upper abdominal burning discomfort & postprandial acidity",
+  historyOfPresentIllness: "Patient reports epigastric burning pain worsening 30 mins after dinner. Duration: 3 days. Onset: Sudden.",
+  pastMedicalHistory: ["Hypertension"],
+  pastSurgicalHistory: ["Appendectomy (2018)"],
+  drugHistory: ["Amlodipine 5mg"],
+  allergyHistory: ["Penicillin"],
+  familyHistory: ["Diabetes"],
+  personalHistory: { dietaryPattern: "VEGETARIAN" },
+  reviewOfSystems: ["NAUSEA"],
+  previousInvestigations: [],
+  currentMedications: ["Amlodipine 5mg"],
+  redFlags: [],
+};
 
 interface DoctorCasePageProps {
   params: Promise<{ id: string }>;
@@ -37,22 +56,59 @@ export default async function DoctorCaseWorkstationPage({ params }: DoctorCasePa
   const { id } = await params;
   await connectToDatabase();
 
-  const caseRecord = await CaseRecord.findById(id);
-  if (!caseRecord) {
-    notFound();
+  const isValidObjectId = mongoose.Types.ObjectId.isValid(id);
+
+  let rawCase = isValidObjectId ? await CaseRecord.findById(id) : null;
+
+  // Graceful fallback for mock/demo cases (e.g., "case-881" or non-ObjectId test cases)
+  if (!rawCase) {
+    const demoCase = MOCK_PATIENT_DATA.previousCases.find((c) => c.id === id);
+    if (demoCase || id.startsWith("case-")) {
+      rawCase = {
+        _id: id,
+        caseNumber: demoCase?.caseNumber || "CASE-2026-081",
+        chiefComplaint: demoCase?.chiefComplaint || "Upper abdominal burning discomfort & postprandial acidity",
+        ayushSystem: "ALLOPATHY / AYURVEDA",
+        severity: demoCase?.severity || "MODERATE",
+        status: demoCase?.status || "PENDING_DOCTOR_REVIEW",
+        patientId: "patient_demo_1" as any,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as any;
+    } else {
+      notFound();
+    }
   }
 
-  const patientUser = await User.findById(caseRecord.patientId);
-  const patientProfile = await PatientProfile.findOne({ userId: caseRecord.patientId });
+  if (!rawCase) {
+    notFound();
+  }
+  const caseRecord = rawCase;
+
+  const isPatientObjectId = caseRecord.patientId && mongoose.Types.ObjectId.isValid(caseRecord.patientId.toString());
+  const patientUser = isPatientObjectId ? await User.findById(caseRecord.patientId) : null;
+  const patientProfile = isPatientObjectId ? await PatientProfile.findOne({ userId: caseRecord.patientId }) : null;
 
   // Get or create clinical summary
-  const summaryDoc = await getOrCreateClinicalSummary(id, caseRecord.patientId.toString());
+  const summaryDoc = isValidObjectId && isPatientObjectId
+    ? await getOrCreateClinicalSummary(id, caseRecord.patientId.toString())
+    : {
+        status: "UNDER_REVIEW" as const,
+        originalAiDraft: MOCK_DEFAULT_SUMMARY,
+        doctorEditedSummary: MOCK_DEFAULT_SUMMARY,
+        verificationNotes: "",
+        provisionalDiagnosis: "",
+        recommendedPlan: "",
+        verifiedAt: undefined,
+      };
 
   // Get raw patient session answers
-  const rawSession = await ClinicalSession.findOne({
-    patientId: caseRecord.patientId,
-    status: "COMPLETED",
-  }).sort({ completedAt: -1 });
+  const rawSession = isPatientObjectId
+    ? await ClinicalSession.findOne({
+        patientId: caseRecord.patientId,
+        status: "COMPLETED",
+      }).sort({ completedAt: -1 })
+    : null;
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -137,11 +193,11 @@ export default async function DoctorCaseWorkstationPage({ params }: DoctorCasePa
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card className="p-4 border-border text-xs space-y-2">
             <div className="flex items-center gap-2 font-bold text-foreground">
-              <FileScan className="h-4 w-4 text-cyan-600" />
-              <span>Digitized Medical Documents</span>
+              <FileCheck2 className="h-4 w-4 text-cyan-600" />
+              <span>Attached Clinical Records</span>
             </div>
             <p className="text-muted-foreground text-[11px]">
-              Past_Prescription_DrSharma.jpg (OCR Parsed 3 parameters)
+              Previous Case Record verified by Dr. Sharma
             </p>
           </Card>
 

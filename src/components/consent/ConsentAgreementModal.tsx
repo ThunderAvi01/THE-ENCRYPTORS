@@ -33,10 +33,7 @@ export function ConsentAgreementModal() {
           2. <strong>Non-Autonomous Diagnosis:</strong> I understand that this software does not provide medical diagnosis or self-prescription. All summaries are strictly verified by a licensed doctor.
         </p>
         <p>
-          3. <strong>Document Digitization:</strong> I authorize optical character recognition (OCR) parsing of my uploaded prescription and lab reports for clinical synthesis.
-        </p>
-        <p>
-          4. <strong>Revocation:</strong> I retain the right to revoke access to my digitized clinical records at any time.
+          3. <strong>Revocation:</strong> I retain the right to revoke access to my clinical intake records at any time.
         </p>
       </div>
 

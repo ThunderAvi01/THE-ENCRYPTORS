@@ -4,6 +4,8 @@ import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { AuthSessionProvider } from "@/components/providers/SessionProvider";
+import { LanguageProvider } from "@/lib/i18n/LanguageContext";
+import { FirstVisitLanguageModal } from "@/components/i18n/FirstVisitLanguageModal";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -12,14 +14,15 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ArogyaIntake | SIH 2026 Structured Clinical Case-Taking & Digitization",
+  title: "ArogyaIntake | SIH 2026 Structured Clinical Case-Taking & Healthcare Interoperability",
   description:
-    "Intelligent, structured clinical case-taking and medical document digitization platform for Indian healthcare (SIH26047). Featuring digital consent, AI-assisted history collection, OCR prescription extraction, FHIR R4 export, and verified physician approval.",
+    "Intelligent, structured multilingual clinical case-taking and verified decision support platform for Indian healthcare (SIH26047). Featuring digital consent, AI-assisted history collection, deterministic emergency triage, FHIR R4 export, and verified physician approval.",
   keywords: [
     "SIH 2026",
     "SIH26047",
     "Clinical Case-Taking",
-    "Medical Document Digitization",
+    "AI Medical History",
+    "Safety Triage",
     "FHIR R4",
     "ABDM",
     "Doctor Verification",
@@ -35,9 +38,12 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <body className="min-h-screen flex flex-col bg-background text-foreground selection:bg-teal-500/20 selection:text-teal-900 dark:selection:text-teal-200">
         <AuthSessionProvider>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <LanguageProvider>
+            <FirstVisitLanguageModal />
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </LanguageProvider>
         </AuthSessionProvider>
       </body>
     </html>

@@ -114,3 +114,21 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
 }
+
+/* YouTube-style Top Progress Bar Animation */
+@keyframes youtube-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-yt-progress {
+  animation: youtube-progress 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+

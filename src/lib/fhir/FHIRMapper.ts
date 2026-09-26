@@ -21,7 +21,7 @@ export interface ClinicalCaseForFHIR {
   documents?: Array<{
     id: string;
     fileName: string;
-    ocrExtractedText?: string;
+    extractedText?: string;
   }>;
   createdAt?: string;
 }
@@ -151,13 +151,13 @@ export class FHIRMapper {
       dateAsserted: timestamp,
     }));
 
-    // 6. DiagnosticReport / DocumentReference (OCR Extracted Records)
+    // 6. DiagnosticReport / DocumentReference (Standard FHIR Clinical Document Reference)
     const documentReferences = (caseData.documents || []).map((doc) => ({
       resourceType: "DocumentReference",
       id: `doc-${doc.id}`,
       status: "current",
       type: {
-        text: "Digitized Medical Record",
+        text: "Clinical Document Reference",
       },
       subject: { reference: `Patient/pat-${caseData.id}` },
       description: doc.fileName,
@@ -165,7 +165,6 @@ export class FHIRMapper {
         {
           attachment: {
             contentType: "text/plain",
-            data: doc.ocrExtractedText ? Buffer.from(doc.ocrExtractedText).toString("base64") : "",
             title: doc.fileName,
           },
         },

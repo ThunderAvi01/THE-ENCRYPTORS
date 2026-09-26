@@ -4,7 +4,6 @@ export type ConsentStatus = "GRANTED" | "REVOKED" | "EXPIRED" | "PENDING";
 
 export interface IConsentScope {
   clinicalCaseTaking: boolean;
-  documentDigitizationOcr: boolean;
   doctorVerificationSharing: boolean;
   abdmInteroperabilitySharing: boolean;
   anonymizedResearchTelemetry: boolean;
@@ -43,7 +42,6 @@ const ConsentSchema = new Schema<IConsent>(
     userAgent: { type: String },
     scope: {
       clinicalCaseTaking: { type: Boolean, default: true },
-      documentDigitizationOcr: { type: Boolean, default: true },
       doctorVerificationSharing: { type: Boolean, default: true },
       abdmInteroperabilitySharing: { type: Boolean, default: true },
       anonymizedResearchTelemetry: { type: Boolean, default: false },
