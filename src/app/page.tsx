@@ -47,12 +47,12 @@ export default function LandingPage() {
       {/* 1. HERO SECTION */}
       <section className="relative overflow-hidden pt-12 pb-20 md:pt-20 md:pb-28 bg-gradient-to-b from-teal-500/10 via-background to-background">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-teal-400/15 via-transparent to-transparent pointer-events-none" />
-        
+
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-teal-500/30 bg-teal-500/10 px-4 py-1.5 text-xs font-semibold text-teal-800 dark:text-teal-300">
               <Sparkles className="h-3.5 w-3.5 text-teal-600 dark:text-teal-400" />
-              <span>SIH 2026 Problem Statement SIH26047</span>
+              {/* <span>SIH 2026 Problem Statement SIH26047</span> */}
               <span className="text-teal-400">•</span>
               <span>Healthcare Innovation</span>
             </div>
